@@ -1,0 +1,17 @@
+{
+  "name": "vkit-profit",
+  "private": true,
+  "type": "module",
+  "workspaces": ["backend", "frontend"],
+  "scripts": {
+    "dev": "bun --filter '*' dev",
+    "build": "bun run build:frontend && bun run build:backend",
+    "build:frontend": "bun run --cwd frontend build",
+    "build:backend": "bun build backend/src/index.ts --target=bun --outdir build/backend",
+    "start": "bun build/backend/index.js",
+    "typecheck": "bun run --cwd backend typecheck && bun run --cwd frontend typecheck",
+    "lint": "bun run --cwd frontend lint",
+    "test": "bun test --cwd backend"
+  }
+}
+

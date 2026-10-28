@@ -1,0 +1,13 @@
+node_modules/
+build/
+temp/*
+!temp/.gitkeep
+backups/*.sqlite*
+logs/*.log
+backend/data/*.sqlite*
+.env.keys
+.env
+.env.*
+!.env.example
+.DS_Store
+

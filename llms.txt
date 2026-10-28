@@ -1,0 +1,378 @@
+# Project UI Engineering Contract
+
+> This file is a persistent, mandatory implementation contract for every AI agent and contributor working on this repository. Apply it to new code, existing code, refactors, bug fixes, and visual changes. These rules take precedence over personal styling preferences. Do not treat them as suggestions.
+
+## 1. Mandatory workflow
+
+Before changing UI code:
+
+1. Inspect the existing project structure, package manager, installed dependencies, framework versions, Tailwind version, and current shadcn/ui setup.
+2. Read the repository's existing `llms.txt` files and the library-specific `llms.txt` files already provided in the project. Follow each library's own documented API and intended use.
+3. Inspect existing components, design tokens, CSS variables, and font files before creating anything new.
+4. Reuse existing project conventions and components. Do not replace working infrastructure without a concrete compatibility reason.
+5. Make the required design-token and font configuration changes early, before implementing or restyling pages.
+6. After implementation, run the available formatter, linter, type checker, tests, and production build. Fix all errors caused by your changes.
+
+Do not stop after describing a plan. Implement the changes. Do not claim a check passed unless you actually ran it.
+
+## 2. Component reuse: strict shadcn/ui requirement
+
+**Do not recreate a component that already exists in the project's shadcn/ui component set when that component is appropriate for the task.**
+
+Before implementing an interactive or semantic UI control, inspect the project's existing shadcn/ui components and use the appropriate component.
+
+Examples include, but are not limited to:
+
+- `Button`
+- `Input`, `Textarea`, `Label`
+- `Checkbox`, `RadioGroup`, `Switch`
+- `Select`, `Combobox`
+- `Slider`
+- `Calendar`, `DatePicker` (if available in the project)
+- `Dialog`, `AlertDialog`, `Drawer`, `Sheet`
+- `Popover`, `Tooltip`, `HoverCard`
+- `DropdownMenu`, `ContextMenu`, `Menubar`, `NavigationMenu`
+- `Tabs`, `Accordion`, `Collapsible`
+- `Table`
+- `Card`, `Badge`, `Avatar`, `Skeleton`
+- `Form` and the project's existing form-validation integration
+- `Command`, `Toast`/`Sonner`, `Progress`, and other installed shadcn/ui components
+
+This list is illustrative, not exhaustive. Check the actual components available in the repository.
+
+### 2.1 No homemade substitutes
+
+If an appropriate shadcn/ui component exists but you use a homemade replacement instead, the implementation is non-compliant and must be corrected.
+
+Examples of forbidden substitutions when a matching project component exists:
+
+- A styled `<input type="checkbox">` instead of the project's `Checkbox`.
+- A styled `<input>` instead of the project's `Input`.
+- A custom clickable `<div>` instead of `Button`.
+- A hand-built dropdown instead of `Select` or `DropdownMenu`.
+- A homemade modal instead of `Dialog` or `AlertDialog`.
+- A hand-built tab interface instead of `Tabs`.
+- A custom tooltip instead of `Tooltip`.
+
+Use native HTML elements where they are semantically appropriate and no matching shadcn component exists. Native elements may also be used inside the implementation of a shadcn component when required by that component's API.
+
+### 2.2 Allowed structural HTML
+
+Plain semantic HTML is allowed for page structure and content containers, including:
+
+- `<header>`, `<footer>`, `<main>`, `<nav>`, `<section>`, `<article>`, `<aside>`
+- `<div>` for layout and grouping where no suitable component exists
+- `<h1>`–`<h6>`, `<p>`, `<span>`, `<ul>`, `<ol>`, `<li>`
+- `<a>` for navigation, `<button>` only when a project component is not appropriate or when required internally by a primitive
+
+Using `<header>` or `<footer>` is explicitly allowed. This exception does **not** permit replacing an existing shadcn/ui control with raw HTML.
+
+Prefer semantic HTML for page landmarks. Prefer shadcn/ui for reusable interactive controls and UI patterns.
+
+### 2.3 Existing components and variants
+
+- Reuse existing project components before adding new ones.
+- Use the existing component's supported variants and sizes.
+- If a needed variant is missing, extend the existing component using the project's established pattern instead of creating a competing component.
+- Do not edit generated or vendor-managed component code blindly. Inspect its source and follow the repository's shadcn/ui conventions.
+- Do not add another UI library to replace shadcn/ui controls.
+- Do not install dependencies that duplicate functionality already available in the project.
+- If no appropriate shadcn component exists, create a small reusable component that follows the same design tokens, accessibility, and project conventions.
+
+## 3. Library responsibilities
+
+Use each library for its intended purpose. The project may include the following libraries; verify which ones are actually installed and read their local documentation before using them.
+
+### shadcn/ui
+Primary source for reusable UI components and interaction patterns. Use it for forms, buttons, controls, menus, dialogs, tables, navigation primitives, feedback states, and other available components.
+
+### React Bits
+Use selectively for distinctive visual elements and effects, such as animated text, decorative backgrounds, visual accents, and presentation-focused components. It is not a replacement for standard shadcn/ui controls. Do not add effects just because they are available.
+
+### Motion for React (`motion`)
+Use for purposeful motion: state transitions, layout changes, entrance/exit animations, gestures, and other interactions that benefit from animation. Respect reduced-motion preferences. Do not animate every element or add motion that impairs usability.
+
+### Magic UI and/or Aceternity UI, if installed or explicitly approved
+Use only for suitable specialized presentation components that add value and fit the chosen art direction. Avoid duplicating components already implemented with shadcn/ui or React Bits. Do not combine multiple decorative effects in the same section without a clear design reason.
+
+### Lucide React
+Use the project's established icon package, preferably `lucide-react` if already installed. Keep icon size, stroke, alignment, and visual weight consistent. Do not mix random icon packs or use emoji as interface icons.
+
+### Tailwind CSS
+Use for layout and styling, with the project's established version and configuration. All design values must come from the central token system described below. Do not use Tailwind classes with arbitrary hardcoded visual values.
+
+### Radix UI
+Use its primitives where appropriate, especially when already used by shadcn/ui. Prefer the project's shadcn wrapper rather than introducing a second independent implementation of the same control.
+
+Do not import a library solely to add a decorative effect that can be achieved simply and consistently with the existing stack.
+
+## 4. Design direction and visual quality
+
+Build a coherent, intentional interface rather than a collection of unrelated prebuilt blocks.
+
+Priorities, in order:
+
+1. Clear information hierarchy and task usability.
+2. Consistent typography and spacing.
+3. Strong layout composition, alignment, and responsive behavior.
+4. Restrained, coherent color and surface treatment.
+5. Accessible interaction states.
+6. Purposeful motion and decorative effects.
+
+Avoid default-looking layouts, excessive card nesting, unnecessary gradients, excessive glow, random rounded corners, gratuitous animation, inconsistent iconography, and visual effects that compete with the content.
+
+Do not add a new font, color, spacing value, radius, shadow, or animation style for a single element without first checking whether an existing token or pattern fits.
+
+## 5. Local fonts only
+
+**All web fonts must be stored and served locally. No runtime font requests to third-party domains are allowed.**
+
+Target directory:
+
+`/frontend/public/fonts/`
+
+This corresponds to the `public/fonts/` directory inside the frontend application, assuming `/frontend` is the frontend project root. Verify the actual repository structure before writing files; do not create a duplicate nested `frontend/frontend` directory.
+
+### 5.1 Font family plan
+
+Use this four-family typography system as the project's default visual identity. The art direction is **technological, precise, and contemporary**, while preserving readability in dense interfaces.
+
+- **Geist — headings and display hierarchy.** Use for page titles (`h1`), section headings (`h2`–`h6`), prominent metrics, and short high-emphasis headings. Create hierarchy through weight and scale; do not make every heading oversized or decorative.
+- **IBM Plex Sans — body and primary content.** Use for paragraphs, descriptions, form content, helper text, card content, and other text intended for sustained reading. This is the default family for general content.
+- **Rubik — navigation and interface labels.** Use for primary navigation, sidebar items, tabs, compact labels, menu items, and short control labels. Keep it role-specific instead of applying it to every paragraph.
+- **Fira Code — data and technical values.** Use for code, identifiers, version strings, technical logs, query fragments, and values where fixed-width characters improve comparison. Use it selectively for tabular metrics or status values. Do not use it for ordinary prose or long paragraphs.
+
+#### Role and inheritance rules
+
+1. Assign families by semantic role, not by individual component preference.
+2. Use IBM Plex Sans as the general text fallback wherever no more specific role applies.
+3. Apply Geist to headings through shared heading styles or typography utilities; do not repeat font-family declarations on individual headings.
+4. Apply Rubik through shared navigation and label styles. Use it for button or form-control labels only where that role benefits from the navigation/label treatment; do not switch all interface text to Rubik indiscriminately.
+5. Apply Fira Code only to technical/data elements. Preserve readable line-height and allow horizontal scrolling for genuinely long code rather than shrinking text excessively.
+6. Do not mix multiple families inside a short label unless there is a clear design reason.
+7. Define font sizes, weights, line heights, and letter spacing as central typography tokens. Family choice does not justify one-off sizing values.
+8. Do not simulate a technological aesthetic with excessive letter spacing, all-caps text, glow, or monospace everywhere. Build the hierarchy with consistent roles, weight, spacing, and layout.
+9. Verify Latin and Cyrillic glyph coverage for all four families when the product contains Russian text. Inspect actual browser rendering; do not assume every font file includes all required characters.
+10. Migrate existing typography patterns consistently rather than changing isolated elements arbitrarily. Preserve an established pattern only when it has a clear product/design purpose.
+
+Prefer official upstream repositories or official project releases with licenses permitting the intended use. Never use a third-party font-hosting CSS URL as the runtime source.
+
+### 5.2 Download and serve fonts locally
+
+1. Inspect existing font files and licenses to avoid unnecessary duplicates.
+2. Obtain Geist, IBM Plex Sans, Rubik, and Fira Code from their official upstream repositories or official releases.
+3. Save font files in `/frontend/public/fonts/`, using clear, stable filenames. This path assumes `/frontend` is the frontend project root; verify the actual repository structure and do not create a duplicate nested `frontend/frontend` directory.
+4. Prefer WOFF2 webfont files when officially available.
+5. Use variable WOFF2 files when officially available and suitable. Otherwise include only the static weights needed by the central typography scale.
+6. Include only the required weight range and language coverage. Ensure each CSS `font-weight` declaration matches the actual file; do not declare a variable range for a static font file.
+7. Add local `@font-face` declarations in the frontend stylesheet with the correct `font-family`, `src: url("/fonts/...") format("woff2")`, `font-weight`, `font-style: normal`, and `font-display: swap`. Add separate italic declarations only if italic styles are actually needed and the corresponding files exist.
+8. Define named font-family tokens in the central theme and reference those tokens throughout the app. Do not scatter literal family names across components.
+9. Inspect browser network requests to confirm that font files load from the project's own origin and no external font provider is contacted.
+10. Keep the applicable font licenses with the font assets or in an appropriate licenses directory.
+
+Never use Google Fonts CSS, `@import` from a font website, remote font URLs, or runtime font CDNs. After the font files are downloaded and deployed, font rendering must not require an internet connection.
+
+Do not invent filenames or claim that fonts have been downloaded until the files actually exist and have been checked. Reuse valid local copies where possible.
+
+## 6. Tailwind theme variables and design tokens
+
+**Configure the project's Tailwind theme variables at the beginning of the implementation. All visual values must use these centralized tokens. Zero hardcoded design values.**
+
+First identify the installed Tailwind major version:
+
+- If the project uses Tailwind CSS v4, follow its CSS-first configuration and `@theme` conventions. Keep tokens in the appropriate global stylesheet.
+- If the project uses Tailwind CSS v3, use the existing `tailwind.config.*` theme extension and CSS variables in a way compatible with the current shadcn/ui setup.
+- Do not migrate between major versions just to follow this document. Preserve the installed version unless migration is explicitly required and safely planned.
+
+Use the existing shadcn/ui CSS-variable conventions where possible, including semantic tokens such as:
+
+- `background`, `foreground`
+- `card`, `card-foreground`
+- `popover`, `popover-foreground`
+- `primary`, `primary-foreground`
+- `secondary`, `secondary-foreground`
+- `muted`, `muted-foreground`
+- `accent`, `accent-foreground`
+- `destructive`
+- `border`, `input`, `ring`
+- `sidebar` tokens if the project uses a sidebar
+- chart tokens if the project actually uses charts
+
+Define consistent tokens for:
+
+- Typography families, sizes, weights, line heights, and letter spacing.
+- Spacing and layout gaps.
+- Container widths and page gutters.
+- Border radii.
+- Border widths and semantic colors.
+- Shadows and elevation.
+- Z-index layers where a shared layer scale is useful.
+- Motion durations and easing where supported by the project's architecture.
+- Breakpoint conventions, using the installed Tailwind version's supported configuration.
+
+Use semantic tokens rather than tying components directly to literal palette values. Define light and dark themes if the product supports both. Ensure foreground/background pairs have sufficient contrast.
+
+### 6.1 Zero hardcoding means
+
+Do not introduce ad hoc values in JSX/TSX, inline styles, or CSS when a token should exist.
+
+Forbidden examples include:
+
+- `text-[#123456]`, `bg-[#0a0a0a]`, `border-[#333]`
+- `text-[17px]`, `p-[19px]`, `gap-[13px]`, `rounded-[11px]`
+- `style={{ color: "#..." }}`, `style={{ marginTop: 23 }}`
+- Repeating literal hex colors, font-family strings, radii, shadows, or spacing values throughout components.
+- One-off CSS declarations that bypass the token system for ordinary design decisions.
+
+Use semantic classes such as `bg-background`, `text-foreground`, `border-border`, `text-muted-foreground`, `bg-primary`, and configured spacing/typography utilities.
+
+If a legitimate design requirement cannot be represented by an existing token, add or adjust a named token in the central theme first, then reference that token. Do not scatter arbitrary values through the codebase.
+
+### 6.2 Allowed non-design values
+
+The rule does not prohibit all literals in code. Functional values that are not design tokens may be literal when appropriate, including:
+
+- `0`, `100%`, `auto`, `inherit`, `currentColor`, `transparent`
+- Required values for algorithms, transforms, SVG geometry, data visualizations, or calculations when no design token is appropriate.
+- One-off values required by a third-party component API, provided they are not arbitrary visual styling decisions and are documented when non-obvious.
+- Content values, URLs, IDs, test data, and application logic.
+
+However, visual values should still use tokens wherever practical. Do not use this exception as a loophole for hardcoded styling.
+
+## 7. Typography scale
+
+Create named typography tokens and use them consistently. The following are starting values, not permission to hardcode these values in individual components. Encode the chosen scale in the central theme and reference it through utilities/classes.
+
+| Role | Suggested size | Suggested line-height | Typical use |
+|---|---:|---:|---|
+| Display XL | 56 px | 1.05 | Rare, large landing-page headline |
+| Display L | 48 px | 1.08 | Landing-page headline |
+| H1 | 36 px | 1.15 | Page title |
+| H2 | 30 px | 1.2 | Main section heading |
+| H3 | 24 px | 1.25 | Subsection heading |
+| H4 | 20 px | 1.3 | Card or panel heading |
+| H5 | 18 px | 1.4 | Minor heading |
+| Body L | 18 px | 1.55 | Lead paragraph |
+| Body | 16 px | 1.5 | Default interface/body text |
+| Body S | 14 px | 1.45 | Supporting text and dense UI |
+| Label | 12 px | 1.4 | Metadata and compact labels |
+| Code | 13–14 px | 1.5 | Code and technical values |
+
+Use responsive typography where needed. Avoid headings that wrap awkwardly or become oversized on small screens. Use font weight and spacing to establish hierarchy rather than increasing font size indiscriminately. Body text should remain comfortable to read.
+
+Do not use Display XL/L for routine dashboard pages. Choose the smallest role that establishes a clear hierarchy. Keep line length comfortable for reading.
+
+## 8. Spacing, layout, and sizing scale
+
+Define and use a consistent spacing scale in the central theme. Suggested base scale:
+
+`0, 4, 8, 12, 16, 20, 24, 32, 40, 48, 64, 80, 96 px`
+
+Use it for padding, margins, gaps, and section spacing. Prefer established Tailwind utilities backed by the configured theme. Do not use arbitrary spacing utilities unless the value has first been promoted to a named token.
+
+Starting layout guidance:
+
+- Small control gaps: 4–8 px.
+- Related control/content spacing: 8–16 px.
+- Standard component padding: 12–24 px, according to density.
+- Section spacing: 32–64 px.
+- Large landing-page section spacing: 64–96 px when justified by composition.
+- Desktop content container: typically around 1120–1280 px maximum.
+- Page gutters: responsive tokens, usually smaller on mobile and larger on desktop.
+- Form controls and buttons: consistent heights based on the component's configured sizes.
+- Responsive layouts: use the project's established breakpoints and verify narrow screens.
+
+These are design guidelines, not hardcoded per-element values. Encode reusable values as tokens or use the spacing scale.
+
+## 9. Color, surfaces, borders, and radii
+
+- Use semantic theme tokens for all UI colors.
+- Do not scatter raw hex, RGB, HSL, or OKLCH values throughout components.
+- Establish clear foreground/background contrast and semantic colors for destructive, warning, success, and informational states when those states are needed.
+- Keep the palette intentional and restrained.
+- Use borders, shadows, and surface levels consistently.
+- Define a small radius scale centrally and use component variants or tokens rather than arbitrary radii.
+- Do not add gradients, glows, blur, glass effects, or strong shadows without a specific design purpose.
+- Keep light and dark themes consistent if both are supported.
+- Do not use color alone to communicate an error or state.
+
+## 10. Responsive design and accessibility
+
+Every page and reusable component must work across mobile, tablet, and desktop layouts.
+
+- Use semantic HTML and accessible names.
+- Preserve keyboard navigation and visible focus states.
+- Use the accessibility behavior provided by shadcn/ui and its underlying primitives.
+- Associate labels with form controls.
+- Provide appropriate error messages and validation feedback.
+- Use suitable contrast for text, controls, and focus indicators.
+- Support reduced motion for non-essential animations.
+- Avoid hover-only interactions that fail on touch devices.
+- Prevent horizontal overflow and clipped content at narrow widths.
+- Test long labels, translated text, empty states, loading states, errors, and disabled states.
+- Use correct heading order and landmark elements.
+- Do not remove accessible behavior merely to achieve a visual effect.
+
+## 11. React and code quality
+
+- Follow the project's existing React and TypeScript conventions.
+- Reuse shared components and utilities rather than duplicating logic.
+- Keep components focused and maintainable.
+- Avoid unnecessary dependencies and unnecessary client-side JavaScript.
+- Do not use `any` to bypass type errors without a compelling, narrowly scoped reason.
+- Do not suppress lint or TypeScript errors merely to make a build pass.
+- Keep business logic separate from presentation when appropriate.
+- Do not add comments unless they clarify genuinely non-obvious logic or the project explicitly requires them.
+- Do not leave TODO placeholders, dead code, temporary debug output, or fake interactions in completed work.
+- Ensure buttons, links, forms, menus, and other controls actually perform their advertised actions.
+
+## 12. Required review and self-correction
+
+Before marking any UI task complete, review the changes against this contract.
+
+### Component audit
+- Did you check whether a suitable shadcn/ui component already exists?
+- Did you use it instead of creating a substitute?
+- Did you reuse existing project components and variants?
+- Are raw HTML elements used only for appropriate structure/content or where no matching shadcn component exists?
+
+### Token audit
+- Are all UI colors semantic theme tokens?
+- Are typography values defined centrally?
+- Are spacing, radii, borders, and shadows sourced from the theme?
+- Are there arbitrary Tailwind values or inline visual styles?
+- Did any component introduce a new one-off visual value instead of adding a named token?
+
+### Font audit
+- Are Geist, IBM Plex Sans, Rubik, and Fira Code assigned to their defined roles?
+- Are the required font files physically present in `/frontend/public/fonts/`?
+- Are font files served from the project's own origin?
+- Are all `@font-face` declarations local and do their declared weight ranges match the actual files?
+- Are Latin and Cyrillic glyphs covered where required?
+- Are family, size, weight, line-height, and letter-spacing choices centralized in typography tokens?
+- Are there any external font requests?
+
+### Design and behavior audit
+- Is the hierarchy clear and consistent?
+- Are spacing and alignment deliberate?
+- Are responsive layouts correct?
+- Do controls work and remain accessible?
+- Are animations purposeful and reduced-motion-aware?
+- Are loading, empty, error, and disabled states handled where relevant?
+
+### Verification
+Run the project's available formatter, linter, type checker, tests, and production build. Report any check that could not be run and why.
+
+**If any mandatory rule is violated, do not consider the task finished. Fix the violation, review the affected area again, and rerun relevant checks.**
+
+## 13. Conflict resolution
+
+If a task request conflicts with this contract, preserve this contract unless the user explicitly directs otherwise. If the repository's actual framework version or component inventory differs from an assumption in this file, inspect the repository and adapt the implementation to the installed version without abandoning the underlying requirement.
+
+Do not invent successful downloads, tests, builds, or audits. Be explicit about what was changed and what was verified.
+
+---
+
+## Quick rule
+
+**Use shadcn/ui for existing UI controls, semantic HTML for page structure, each visual library only for its intended purpose, locally stored fonts only, and centralized Tailwind theme variables for all design values. No duplicate controls. No scattered hardcoded styling. Audit and fix violations before finishing.**
