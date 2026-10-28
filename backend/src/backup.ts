@@ -9,7 +9,7 @@ mkdirSync(backupDir, { recursive: true });
 export async function createBackup() {
   const timestamp = new Date().toISOString().replaceAll(":", "-").replace(".", "-");
   const destination = resolve(backupDir, `profit-hub-${timestamp}.sqlite`);
-  await db.serialize(destination);
+  db.query("VACUUM INTO ?").run(destination);
   return destination;
 }
 

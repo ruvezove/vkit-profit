@@ -1,5 +1,5 @@
 import { afterAll, beforeAll, describe, expect, test } from "bun:test";
-import { rmSync } from "node:fs";
+import { rmSync, statSync } from "node:fs";
 import { resolve } from "node:path";
 import type { FastifyInstance } from "fastify";
 
@@ -82,6 +82,13 @@ describe("security baseline", () => {
     const item = response.json().variables.find((variable: { key: string }) => variable.key === "ADMIN_API_KEY_CY");
     expect(item.sensitive).toBe(true);
     expect(item.value).not.toContain(adminKey);
+  });
+
+  test("creates a consistent SQLite backup", async () => {
+    const { createBackup } = await import("../src/backup");
+    const path = await createBackup();
+    expect(statSync(path).size).toBeGreaterThan(0);
+    rmSync(path, { force: true });
   });
 });
 
