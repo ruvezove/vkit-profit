@@ -2,11 +2,15 @@ import { spawn } from "node:child_process";
 import { getSetting, setSetting } from "./db";
 
 let restartTimer: ReturnType<typeof setTimeout> | undefined;
+const maximumTimerDelay = 2_147_483_647;
 
-export function scheduleRestart(at: Date) {
-  if (restartTimer) clearTimeout(restartTimer);
-  setSetting("scheduled_restart_at", at.toISOString());
-  const delay = Math.max(0, at.getTime() - Date.now());
+function armRestart(at: Date) {
+  const remaining = at.getTime() - Date.now();
+  if (remaining > maximumTimerDelay) {
+    restartTimer = setTimeout(() => armRestart(at), maximumTimerDelay);
+    restartTimer.unref();
+    return;
+  }
   restartTimer = setTimeout(() => {
     setSetting("scheduled_restart_at", "");
     const child = spawn("oxmgr", ["restart", "vkit-profit"], {
@@ -14,8 +18,14 @@ export function scheduleRestart(at: Date) {
       stdio: "ignore",
     });
     child.unref();
-  }, Math.min(delay, 2_147_483_647));
+  }, Math.max(0, remaining));
   restartTimer.unref();
+}
+
+export function scheduleRestart(at: Date) {
+  if (restartTimer) clearTimeout(restartTimer);
+  setSetting("scheduled_restart_at", at.toISOString());
+  armRestart(at);
 }
 
 export function restoreScheduledRestart() {
