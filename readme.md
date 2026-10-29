@@ -19,7 +19,10 @@ Production-конфигурация загружается через `@dotenvx/
 
 - `GET /api/site`, `GET /api/comments`
 - `POST /api/comments`, `POST /api/requests`, `POST /api/wishes`
-- `POST /api/auth/register`
+- `POST /api/auth/register/start`, `POST /api/auth/register/complete`
+- `GET /api/auth/verify-email`, `POST /api/auth/login`, `POST /api/auth/logout`, `GET /api/auth/session`
+- `POST /api/auth/password-reset/request`, `POST /api/auth/password-reset/verify-code`, `POST /api/auth/password-reset/complete`
+- `POST /api/auth/admin/login`
 
 Администраторские маршруты требуют `Authorization: Bearer <ADMIN_API_KEY_CY>`:
 
@@ -34,8 +37,11 @@ Production-конфигурация загружается через `@dotenvx/
 | Требование | Контроль | Реализация | Проверка |
 |---|---|---|---|
 | Валидация входа | Полные JSON Schema, запрет лишних полей | Fastify/Ajv | Негативные inject-тесты |
-| Защита админских действий | Bearer secret + constant-time compare | `requireAdmin` | 401 без/с неверным токеном |
-| Пароли | Argon2id, лимит длины и rate limit | `Bun.password` | Проверка формата хеша и регистрации |
+| Защита админских действий | Ролевая HttpOnly-сессия; служебный Bearer secret сохранён для API | `sessions`, `requireAdmin` | Проверка входа и отказ без авторизации |
+| Пароли | Argon2id для пользователей, bcrypt-хеш для настроенного администратора, лимиты длины и частоты | `Bun.password` | Проверка формата хеша, регистрации и входа |
+| Подтверждение почты | Одноразовый SHA-256 токен на 5 минут, Gmail SMTP | `email_verification_tokens`, Nodemailer | Подтверждение не создаёт сессию |
+| Сброс пароля | Шестизначный код на 5 минут, лимит попыток, отдельный challenge | `password_reset_codes` | Неверные/просроченные коды отклоняются |
+| Сессии | Случайный токен хранится только в виде SHA-256, cookie `HttpOnly`, `SameSite=Strict` | `sessions`, `@fastify/cookie` | Проверка пользовательской и админской сессии |
 | SQL injection | Параметризованные prepared statements | `bun:sqlite` | Payload хранится как данные |
 | Brute force / DoS | Глобальные и маршрутные лимиты, body/time limits | `@fastify/rate-limit`, Fastify | 429 и oversized-body тесты |
 | XSS / browser hardening | Текстовый вывод React, CSP и security headers | `@fastify/helmet` | Проверка заголовков |
@@ -43,4 +49,4 @@ Production-конфигурация загружается через `@dotenvx/
 | Логи | Только `logs/server.log`, redaction | Pino/Fastify | Authorization/password/value исключены |
 | Резервирование | SQLite serialize каждые 12 часов и endpoint | `bun:sqlite` | Создание и размер backup |
 
-Ограничения текущего baseline: API key является начальным админским механизмом до появления полноценной панели и ролевых сессий; TLS должен быть включён непосредственно в приложении либо в доверенной локальной инфраструктуре до публикации в недоверенную сеть. Valkey используется для health-проверки и подготовлен для будущего общего состояния; текущий rate limit рассчитан на один процесс.
+Ограничения текущего baseline: TLS должен быть включён непосредственно в приложении либо в доверенной локальной инфраструктуре до публикации в недоверенную сеть. Флаг `Secure` для cookie активируется автоматически при HTTPS-origin. Valkey используется для health-проверки и подготовлен для будущего общего состояния; текущий rate limit рассчитан на один процесс.

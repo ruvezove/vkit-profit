@@ -10,10 +10,12 @@
   "dependencies": {
     "@dotenvx/dotenvx": "^1.51.4",
     "@fastify/cors": "^11.1.0",
+    "@fastify/cookie": "^11.0.2",
     "@fastify/helmet": "^13.0.2",
     "@fastify/rate-limit": "^10.3.0",
     "@fastify/static": "^10.1.8",
     "fastify": "^5.6.1",
+    "nodemailer": "^10.2.1",
     "pino": "^9.14.0"
   },
   "devDependencies": {

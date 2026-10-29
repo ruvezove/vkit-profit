@@ -1,6 +1,7 @@
 import Fastify from "fastify";
 import helmet from "@fastify/helmet";
 import cors from "@fastify/cors";
+import cookie from "@fastify/cookie";
 import rateLimit from "@fastify/rate-limit";
 import staticPlugin from "@fastify/static";
 import { existsSync, mkdirSync } from "node:fs";
@@ -9,6 +10,7 @@ import { config, projectRoot } from "./config";
 import { getSetting } from "./db";
 import { adminRoutes, type HealthMetrics } from "./routes/admin";
 import { publicRoutes } from "./routes/public";
+import { authRoutes } from "./routes/auth";
 
 export async function buildApp() {
   const logsDir = resolve(projectRoot, "logs");
@@ -60,6 +62,7 @@ export async function buildApp() {
     },
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
   });
+  await app.register(cookie);
   await app.register(rateLimit, {
     max: 120,
     timeWindow: "1 minute",
@@ -70,6 +73,7 @@ export async function buildApp() {
   });
 
   await app.register(publicRoutes, { prefix: "/api" });
+  await app.register(authRoutes, { prefix: "/api/auth" });
   await app.register(async (instance) => adminRoutes(instance, metrics), { prefix: "/api/admin" });
 
   app.setErrorHandler((error, request, reply) => {

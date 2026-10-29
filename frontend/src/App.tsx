@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollProgress } from "@/components/scroll-progress";
+import { AdminLoginPage, AdminPage, ForgotPasswordPage, LoginPage, RegisterPage, VerifyEmailPage } from "@/pages/auth-pages";
 
 const features = [
   { icon: BookOpen, eyebrow: "Курсы", title: "Материал, который ведёт вперёд", text: "Собирайте уроки в понятные маршруты и сохраняйте контекст обучения в одном месте." },
@@ -63,7 +64,7 @@ function FeedbackForm({ kind, onSent }: { kind: SubmissionKind; onSent: () => vo
   );
 }
 
-export default function App() {
+function LandingPage() {
   const reduceMotion = useReducedMotion();
   const [comments, setComments] = useState<Comment[]>([]);
   const [notice, setNotice] = useState(0);
@@ -83,7 +84,7 @@ export default function App() {
           <nav className="font-label hidden items-center gap-7 text-sm md:flex" aria-label="Основная навигация">
             <a className="nav-link" href="#possibilities">Возможности</a><a className="nav-link" href="#process">Как это работает</a><a className="nav-link" href="#feedback">Обратная связь</a>
           </nav>
-          <Button asChild size="sm"><a href="#start">Начать <ArrowRight className="size-4" /></a></Button>
+          <Button asChild size="sm"><a href="/login">Войти <ArrowRight className="size-4" /></a></Button>
         </div>
       </header>
 
@@ -95,7 +96,7 @@ export default function App() {
               <p className="eyebrow mb-5"><Sparkles className="size-4" /> Учиться вместе — проще</p>
               <h1 className="text-display font-semibold text-balance">Место, где знания становятся <span className="text-primary">общим движением</span></h1>
               <p className="mt-6 max-w-prose text-body-lg text-muted-foreground">Курсы, тесты и командная работа собраны в спокойной, понятной среде. Каждый видит цель, прогресс и следующий шаг.</p>
-              <div className="mt-8 flex flex-col gap-3 sm:flex-row"><Button size="lg" asChild><a href="#possibilities">Посмотреть возможности <ArrowRight className="size-5" /></a></Button><Button size="lg" variant="outline" asChild><a href="#feedback">Оставить идею</a></Button></div>
+              <div className="mt-8 flex flex-col gap-3 sm:flex-row"><Button size="lg" asChild><a href="/register">Создать аккаунт <ArrowRight className="size-5" /></a></Button><Button size="lg" variant="outline" asChild><a href="/login">Войти</a></Button></div>
             </motion.div>
             <motion.div className="relative mx-auto w-full max-w-visual" initial={reduceMotion ? undefined : { opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.7, delay: 0.12 }}>
               <div className="orbit-panel aspect-square rounded-full border border-border bg-card p-8 shadow-lift">
@@ -136,11 +137,22 @@ export default function App() {
 
         <section className="container-page pb-section"><div className="grid gap-10 border-t border-border pt-section lg:grid-cols-process"><div><p className="eyebrow">Коротко о главном</p><h2 className="mt-4 text-h2 font-semibold">Вопросы до старта</h2></div><Accordion type="single" collapsible>{faq.map(([question, answer], index) => <AccordionItem value={`item-${index}`} key={question}><AccordionTrigger>{question}</AccordionTrigger><AccordionContent>{answer}</AccordionContent></AccordionItem>)}</Accordion></div></section>
 
-        <section id="start" className="border-t border-border bg-primary text-primary-foreground"><div className="container-page flex flex-col items-start justify-between gap-8 py-14 md:flex-row md:items-center"><div><p className="font-label text-sm font-semibold opacity-80">Готовы собрать обучение в одном месте?</p><h2 className="mt-2 text-h2 font-semibold">Начните с общей цели.</h2></div><Button variant="secondary" size="lg" asChild><a href="#possibilities">Изучить платформу <ArrowRight className="size-5" /></a></Button></div></section>
+        <section id="start" className="border-t border-border bg-primary text-primary-foreground"><div className="container-page flex flex-col items-start justify-between gap-8 py-14 md:flex-row md:items-center"><div><p className="font-label text-sm font-semibold opacity-80">Готовы собрать обучение в одном месте?</p><h2 className="mt-2 text-h2 font-semibold">Начните с общей цели.</h2></div><Button variant="secondary" size="lg" asChild><a href="/register">Зарегистрироваться <ArrowRight className="size-5" /></a></Button></div></section>
       </main>
 
       <footer className="border-t border-border"><div className="container-page flex flex-col gap-4 py-8 text-sm text-muted-foreground md:flex-row md:items-center md:justify-between"><span className="font-heading font-semibold text-foreground">Profit/Hub</span><p>Курсы, тесты и командная работа в общем ритме.</p><a className="nav-link" href="#top">Наверх ↑</a></div></footer>
     </div>
   );
+}
+
+export default function App() {
+  const path = window.location.pathname.replace(/\/$/, "") || "/";
+  if (path === "/login") return <LoginPage />;
+  if (path === "/register") return <RegisterPage />;
+  if (path === "/verify-email") return <VerifyEmailPage />;
+  if (path === "/forgot-password") return <ForgotPasswordPage />;
+  if (path === "/admin-login") return <AdminLoginPage />;
+  if (path === "/admin") return <AdminPage />;
+  return <LandingPage />;
 }
 

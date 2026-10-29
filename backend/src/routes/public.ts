@@ -43,39 +43,5 @@ export async function publicRoutes(app: FastifyInstance) {
   app.post<{ Body: SubmissionBody }>("/requests", { schema: { body: submissionBody }, config: { rateLimit: { max: 4, timeWindow: "5 minutes" } } }, createSubmission("request"));
   app.post<{ Body: SubmissionBody }>("/wishes", { schema: { body: submissionBody }, config: { rateLimit: { max: 4, timeWindow: "5 minutes" } } }, createSubmission("wish"));
 
-  app.post<{ Body: { email: string; displayName: string; password: string } }>(
-    "/auth/register",
-    {
-      schema: {
-        body: {
-          type: "object",
-          ...strictObject,
-          required: ["email", "displayName", "password"],
-          properties: {
-            email: { type: "string", format: "email", maxLength: 254 },
-            displayName: { type: "string", minLength: 2, maxLength: 80 },
-            password: { type: "string", minLength: 12, maxLength: 128 },
-          },
-        },
-      },
-      config: { rateLimit: { max: 3, timeWindow: "10 minutes" } },
-    },
-    async (request, reply) => {
-      const email = request.body.email.trim().toLowerCase();
-      const exists = db.query("SELECT 1 FROM users WHERE email = ?").get(email);
-      if (exists) {
-        return reply.code(409).send({ error: "registration_unavailable", message: "Registration could not be completed." });
-      }
-      const passwordHash = await Bun.password.hash(request.body.password, {
-        algorithm: "argon2id",
-        memoryCost: 65536,
-        timeCost: 3,
-      });
-      const id = crypto.randomUUID();
-      db.query("INSERT INTO users(id, email, display_name, password_hash, created_at) VALUES (?, ?, ?, ?, ?)")
-        .run(id, email, request.body.displayName.trim(), passwordHash, new Date().toISOString());
-      return reply.code(201).send({ id, displayName: request.body.displayName.trim() });
-    },
-  );
 }
 

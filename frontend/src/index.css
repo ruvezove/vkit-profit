@@ -80,6 +80,7 @@
   --copy: 42rem;
   --visual: 30rem;
   --caption: 13rem;
+  --auth-width: 34rem;
   --hero-min: 42rem;
   --section-space: clamp(4rem, 8vw, 6rem);
   --header-height: 4.5rem;
@@ -133,6 +134,7 @@
   --spacing-section: var(--section-space);
   --spacing-18: var(--header-height);
   --spacing-13: 3.25rem;
+  --spacing-admin: 32rem;
   --grid-template-columns-hero: minmax(0, 1.15fr) minmax(18rem, 0.85fr);
   --grid-template-columns-process: minmax(16rem, 0.75fr) minmax(0, 1.25fr);
   --z-index-header: 30;
@@ -174,6 +176,7 @@ button, nav, label { font-family: "Rubik", sans-serif; }
 .max-w-copy { max-width: var(--copy); }
 .max-w-visual { max-width: var(--visual); }
 .max-w-caption { max-width: var(--caption); }
+.max-w-auth { max-width: var(--auth-width); }
 .max-w-prose { max-width: 65ch; }
 .min-h-hero { min-height: var(--hero-min); }
 .text-balance { text-wrap: balance; }
@@ -185,6 +188,13 @@ button, nav, label { font-family: "Rubik", sans-serif; }
 .icon-shell { display: inline-flex; width: 2.75rem; height: 2.75rem; align-items: center; justify-content: center; border-radius: 999px; background: var(--accent); color: var(--accent-foreground); }
 .grid-field { background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px); background-size: 3rem 3rem; mask-image: linear-gradient(to bottom, black, transparent 80%); }
 .orbit-panel { animation: orbit-float 7s ease-in-out infinite; }
+.auth-page { display: grid; min-height: 100vh; grid-template-columns: minmax(20rem, 0.8fr) minmax(28rem, 1.2fr); background: var(--background); }
+.auth-aside { display: flex; flex-direction: column; justify-content: space-between; gap: 3rem; border-right: 1px solid var(--border); padding: var(--page-gutter); background: var(--secondary); }
+.auth-content { position: relative; display: flex; align-items: center; justify-content: center; padding: var(--section-space) var(--page-gutter); }
+.auth-admin-link { position: absolute; right: var(--page-gutter); bottom: 1.5rem; font-family: "Rubik", sans-serif; font-size: 0.75rem; color: var(--muted-foreground); transition: color var(--duration-slow) ease; }
+.auth-admin-link:hover { color: var(--primary); }
+.auth-name-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+.min-h-admin { min-height: var(--spacing-admin); }
 
 @keyframes orbit-float { 0%, 100% { transform: translateY(0) rotate(-1deg); } 50% { transform: translateY(-0.75rem) rotate(1deg); } }
 
@@ -196,5 +206,9 @@ button, nav, label { font-family: "Rubik", sans-serif; }
 @media (max-width: 47.99rem) {
   :root { --hero-min: auto; }
   .grid-field { background-size: 2rem 2rem; }
+  .auth-page { grid-template-columns: 1fr; }
+  .auth-aside { display: none; }
+  .auth-content { min-height: 100vh; align-items: flex-start; padding-bottom: 5rem; }
+  .auth-name-grid { grid-template-columns: 1fr; }
 }
 
